@@ -15,7 +15,7 @@ variable "aws_instance_type" {
 variable "aws_instance_name" {
   description = "The name to assign to the EC2 instance"
   type        = string
-  default     = "n8n"
+  default     = "kanvas-ops"
 
 }
 
