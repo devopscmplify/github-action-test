@@ -30,14 +30,11 @@ variable "environment" {
 variable "bucket_name" {
   description = "The name of the S3 bucket"
   type        = string
-  default     = "ops-bk" # Example bucket name, replace with your own
+  default     = "kanvas-ops-bk" # Example bucket name, replace with your own
   
 }
 
-module "s3_bucket" {
-  source = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
 
-  bucket = "online-mod-bk"
+ 
 
-}
+ 
