@@ -1,0 +1,57 @@
+name: Terraform Plan
+
+on:
+    pull_request:
+        types:
+        - closed
+
+env:
+  tf_actions_working_dir: './dev'
+
+
+jobs:
+  if_merged:
+      if: github.event.pull_request.merged == true
+      name: Terraform Apply
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: ${{ env.tf_actions_working_dir }}  
+      permissions:
+        id-token: write
+        actions: read        # Required to identify workflow run.
+        checks: write        # Required to add status summary.
+        contents: read       # Required to checkout repository.
+        pull-requests: write # Required to add PR comment.
+      
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  
+        
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          audience: sts.amazonaws.com
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::746196583728:role/ga-role-aws
+        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3  
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true  
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false  
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color  
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+        continue-on-error: true  
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve -no-color -input=false
+        continue-on-error: true
